@@ -25,7 +25,7 @@ class EnhancementResult:
 
 class PromptEnhancer:
     """
-    Core engine for enhancing prompts using OpenAI GPT-4o.
+    Core engine for enhancing prompts using OpenAI GPT-4.1.
 
     Based on research from:
     - DSE v7.0 (Deep Semantic Enhancer)
@@ -33,13 +33,13 @@ class PromptEnhancer:
     - MCP Prompt Optimizer (Research-backed strategies)
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o"):
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4.1"):
         """
         Initialize the enhancer.
 
         Args:
             api_key: OpenAI API key. If not provided, reads from OPENAI_API_KEY env var.
-            model: Model to use for enhancement. Default: gpt-4o (best available)
+            model: Model to use for enhancement. Default: gpt-4.1 (best available)
         """
         load_dotenv(override=True)  # Override existing env vars with .env file
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
