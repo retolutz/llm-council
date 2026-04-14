@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Prompt Enhancer CLI
-Transform basic prompts into professional-grade prompts using o3.
+Transform basic prompts into professional-grade prompts using multiple LLMs.
 """
 
 import sys
@@ -9,23 +9,31 @@ import click
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.markdown import Markdown
 from rich.prompt import Prompt
-from rich import print as rprint
 
 from enhancer import PromptEnhancer
+from council import LLMCouncil
 from strategies import STRATEGY_DESCRIPTIONS, ALL_STRATEGIES
 
 console = Console()
 
 
-def print_banner():
+def print_banner(mode="single"):
     """Print the application banner."""
-    banner = """
+    if mode == "council":
+        banner = """
+[bold magenta]╔═══════════════════════════════════════════════════════════╗
+║           🏛️  LLM COUNCIL v1.0                             ║
+║     Multi-model prompt enhancement with aggregation        ║
+║        o3 + Claude Opus 4 + Gemini 2.0                    ║
+╚═══════════════════════════════════════════════════════════╝[/bold magenta]
+"""
+    else:
+        banner = """
 [bold cyan]╔═══════════════════════════════════════════════════════════╗
 ║           🚀 PROMPT ENHANCER v1.0                         ║
 ║     Transform basic prompts into professional-grade       ║
-║          prompts using o3                             ║
+║          prompts using o3                                 ║
 ╚═══════════════════════════════════════════════════════════╝[/bold cyan]
 """
     console.print(banner)
@@ -63,7 +71,7 @@ def cli():
 @click.option("--interactive", "-i", is_flag=True, help="Interactive mode")
 def enhance(prompt, strategy, file, output, temperature, compare, interactive):
     """
-    Enhance a prompt using o3.
+    Enhance a prompt using o3 (single model).
 
     Examples:
         prompt-enhancer enhance "Write a poem about nature"
@@ -170,6 +178,104 @@ def enhance(prompt, strategy, file, output, temperature, compare, interactive):
             console.print(f"  Enhanced: {comparison.get('enhanced_score', 'N/A')}/10")
         else:
             console.print(comparison.get("raw_comparison", "Analysis not available"))
+
+    # Write to file if requested
+    if output:
+        with open(output, "w") as f:
+            f.write(result.enhanced_prompt)
+        console.print(f"\n[green]Enhanced prompt saved to: {output}[/green]")
+
+
+@cli.command()
+@click.argument("prompt", required=False)
+@click.option("--strategy", "-s", default="master", help="Enhancement strategy to use")
+@click.option("--file", "-f", type=click.Path(exists=True), help="Read prompt from file")
+@click.option("--output", "-o", type=click.Path(), help="Write enhanced prompt to file")
+@click.option("--show-all", "-a", is_flag=True, help="Show all individual responses")
+def council(prompt, strategy, file, output, show_all):
+    """
+    Enhance a prompt using LLM Council (multiple models).
+
+    Uses o3 (OpenAI) + Claude Opus 4 (Anthropic) + Gemini 2.0 (Google)
+    in parallel, then aggregates the best result.
+
+    Examples:
+        prompt-enhancer council "Write a business plan"
+        prompt-enhancer council -a "Create a marketing strategy"  # Show all responses
+    """
+    print_banner(mode="council")
+
+    # Get prompt from file or argument
+    if file:
+        with open(file, "r") as f:
+            prompt = f.read().strip()
+    elif not prompt:
+        console.print("[red]Error: Please provide a prompt or use --file/-f to read from file[/red]")
+        sys.exit(1)
+
+    # Validate strategy
+    if strategy not in ALL_STRATEGIES:
+        console.print(f"[red]Error: Unknown strategy '{strategy}'[/red]\n")
+        print_strategies()
+        sys.exit(1)
+
+    # Initialize council
+    try:
+        llm_council = LLMCouncil()
+    except Exception as e:
+        console.print(f"[red]Error initializing council: {e}[/red]")
+        sys.exit(1)
+
+    # Show available members
+    members = llm_council.get_available_members()
+    console.print(f"[bold]Council Members:[/bold] {', '.join(members)}\n")
+
+    # Show original prompt
+    console.print(Panel(
+        prompt,
+        title="[bold blue]Original Prompt[/bold blue]",
+        border_style="blue"
+    ))
+
+    # Enhance with council
+    with console.status("[bold magenta]Council is deliberating (parallel LLM calls)..."):
+        result = llm_council.enhance(prompt, strategy=strategy)
+
+    # Show individual responses if requested
+    if show_all:
+        console.print("\n[bold]Individual Responses:[/bold]")
+        for member in result.members:
+            if member.error:
+                console.print(Panel(
+                    f"[red]Error: {member.error}[/red]",
+                    title=f"[bold red]{member.name}[/bold red]",
+                    border_style="red"
+                ))
+            else:
+                console.print(Panel(
+                    member.response[:500] + "..." if len(member.response) > 500 else member.response,
+                    title=f"[bold yellow]{member.name}[/bold yellow]",
+                    border_style="yellow"
+                ))
+
+    # Show aggregator reasoning
+    if result.aggregator_reasoning:
+        console.print(Panel(
+            result.aggregator_reasoning,
+            title="[bold cyan]Aggregator Reasoning[/bold cyan]",
+            border_style="cyan"
+        ))
+
+    # Show final result
+    console.print(Panel(
+        result.enhanced_prompt,
+        title="[bold green]Final Enhanced Prompt (Council Decision)[/bold green]",
+        border_style="green"
+    ))
+
+    # Stats
+    successful = sum(1 for m in result.members if not m.error)
+    console.print(f"\n[dim]Models: {successful}/{len(result.members)} successful | Total tokens: {result.total_tokens}[/dim]")
 
     # Write to file if requested
     if output:

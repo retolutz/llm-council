@@ -8,9 +8,11 @@ setup(
     description="Transform basic prompts into professional-grade prompts using o3",
     author="retolutz",
     python_requires=">=3.9",
-    py_modules=["enhancer", "strategies", "cli"],
+    py_modules=["enhancer", "strategies", "cli", "council"],
     install_requires=[
         "openai>=1.40.0",
+        "anthropic>=0.39.0",
+        "google-genai>=1.0.0",
         "rich>=13.7.0",
         "click>=8.1.7",
         "python-dotenv>=1.0.0",
