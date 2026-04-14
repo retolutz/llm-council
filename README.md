@@ -1,11 +1,21 @@
 # Prompt Enhancer
 
-Transform basic prompts into professional-grade prompts using o3.
+Transform basic prompts into professional-grade prompts using the best AI models.
 
-Based on research from top prompt engineering projects:
-- [AI-Prompt-Enhancer](https://github.com/Pythonation/AI-Prompt-Enhancer) - DSE v7.0 cognitive architecture
-- [AutoPrompt](https://github.com/Eladlev/AutoPrompt) - Intent-based calibration
-- [MCP Prompt Optimizer](https://github.com/Bubobot-Team/mcp-prompt-optimizer) - Research-backed strategies
+## Features
+
+- **Single Model**: Use o3 (OpenAI) for fast enhancement
+- **LLM Council**: Use 3 models in parallel (o3 + Claude Opus 4 + Gemini 2.5 Pro) with intelligent aggregation
+- **10 Enhancement Strategies**: Master, role injection, chain-of-thought, and more
+- **Prompt Analysis**: Analyze prompts for ambiguities and improvements
+
+## Models Used
+
+| Provider | Model | Role |
+|----------|-------|------|
+| OpenAI | **o3** | Best reasoning model |
+| Anthropic | **Claude Opus 4** | Best Claude + Aggregator |
+| Google | **Gemini 2.5 Pro** | Best Gemini model |
 
 ## Installation
 
@@ -17,46 +27,82 @@ pip install -e .
 
 ```bash
 cp .env.example .env
-# Edit .env and add your OpenAI API key
+```
+
+Add your API keys to `.env`:
+```
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_API_KEY=AIza...
 ```
 
 ## Usage
 
-### Enhance a prompt (Master strategy - recommended)
+### LLM Council (Recommended for important prompts)
+
+Uses all 3 models in parallel, then aggregates the best result:
+
+```bash
+prompt-enhancer council "Write a business plan for an AI startup"
+
+# Show all individual responses
+prompt-enhancer council -a "Create a marketing strategy"
+```
+
+### Single Model Enhancement
+
+Fast enhancement using o3:
 
 ```bash
 prompt-enhancer enhance "Write a blog post about AI"
-```
 
-### With comparison analysis
-
-```bash
+# With comparison analysis
 prompt-enhancer enhance -c "Create a marketing strategy"
-```
 
-### Interactive mode
-
-```bash
+# Interactive mode
 prompt-enhancer enhance -i
-```
 
-### Specific strategy
-
-```bash
+# Specific strategy
 prompt-enhancer enhance -s role "Help me code"
 prompt-enhancer enhance -s cot "Solve this problem"
 ```
 
-### Iterative enhancement (multiple strategies)
+### Iterative Enhancement
+
+Apply multiple strategies sequentially:
 
 ```bash
 prompt-enhancer iterative "Build an app"
 ```
 
-### Analyze a prompt
+### Analyze a Prompt
 
 ```bash
 prompt-enhancer analyze "Make my website faster"
+```
+
+## LLM Council Architecture
+
+```
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│   o3 (OpenAI)   │  │ Claude Opus 4   │  │ Gemini 2.5 Pro  │
+│    Reasoning    │  │    Synthesis    │  │    Creative     │
+└────────┬────────┘  └────────┬────────┘  └────────┬────────┘
+         │                    │                    │
+         └───────────── parallel ─────────────────┘
+                              │
+                              ▼
+                   ┌──────────────────────┐
+                   │   Claude Opus 4      │
+                   │   (Aggregator)       │
+                   │   Selects/merges     │
+                   │   best elements      │
+                   └──────────┬───────────┘
+                              │
+                              ▼
+                   ┌──────────────────────┐
+                   │   Final Prompt       │
+                   └──────────────────────┘
 ```
 
 ## Available Strategies
@@ -78,52 +124,61 @@ prompt-enhancer analyze "Make my website faster"
 
 **Input:**
 ```
-Schreibe einen Blog über KI
+Schreibe einen LinkedIn Post über KI
 ```
 
-**Output:**
+**Output (Council):**
 ```
-Als erfahrener Tech-Blogger und KI-Experte, erstelle einen
-umfassenden Blog-Artikel über Künstliche Intelligenz.
+Du bist ein erfahrener deutschsprachiger LinkedIn Content Creator
+mit nachweislicher Expertise in Tech-Themen und viralen B2B-Posts.
 
-1. **Einleitung**: Captivating hook über die Bedeutung von KI
-2. **Geschichte**: Wichtige Meilensteine der KI-Entwicklung
-3. **Anwendungen**: 3+ aktuelle Use Cases mit Beispielen
-4. **Zukunft**: Prognosen und gesellschaftliche Auswirkungen
-5. **Ethik**: Herausforderungen und Lösungsansätze
-6. **Fazit**: Zusammenfassung und Ausblick
+**STRUKTURVORGABEN:**
+1. Hook (erste 2 Zeilen): Starke, überraschende Aussage
+2. Story/Insight (2-3 Absätze): Persönliche Anekdote oder Datenpunkt
+3. Praktischer Nutzen: 3-5 konkrete Takeaways
+4. Call-to-Action: Engagementfördernde Frage
 
-**Constraints:**
-- Länge: 1000-1500 Wörter
-- Sprache: Deutsch
-- Ton: Informativ, aber zugänglich
-- Format: Unterüberschriften verwenden
+**FORMATVORGABEN:**
+- Länge: 150-250 Wörter
+- Kurze Absätze (max. 2-3 Sätze)
+- 1 passendes Emoji pro Absatz
+- 3-5 relevante Hashtags am Ende
 
-**Quality Gates:**
-- Logischer Aufbau
-- Quellenangaben für Fakten
-- Grammatik-Check vor Abgabe
+**VIRALITÄTSFAKTOREN:**
+- Polarisierend ohne unsachlich zu sein
+- Emotionaler Bezug
+- Diskussionsanregend und teilbar
 ```
 
 ## Python API
 
 ```python
+# Single model
 from enhancer import PromptEnhancer
 
 enhancer = PromptEnhancer()
-
-# Single strategy
 result = enhancer.enhance("Your prompt", strategy="master")
 print(result.enhanced_prompt)
 
-# Iterative (multiple strategies)
-result = enhancer.enhance_iterative("Your prompt")
-print(result.enhanced_prompt)
+# LLM Council
+from council import LLMCouncil
 
-# Analyze only
-analysis = enhancer.analyze("Your prompt")
-print(analysis)
+council = LLMCouncil()
+result = council.enhance("Your prompt")
+print(result.enhanced_prompt)
+print(result.aggregator_reasoning)
+
+# Access individual responses
+for member in result.members:
+    print(f"{member.name}: {member.response[:100]}...")
 ```
+
+## Based On
+
+Research from top prompt engineering projects:
+- [AI-Prompt-Enhancer](https://github.com/Pythonation/AI-Prompt-Enhancer) - DSE v7.0 cognitive architecture
+- [AutoPrompt](https://github.com/Eladlev/AutoPrompt) - Intent-based calibration
+- [MCP Prompt Optimizer](https://github.com/Bubobot-Team/mcp-prompt-optimizer) - Research-backed strategies
 
 ## License
 
