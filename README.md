@@ -1,240 +1,190 @@
-# Prompt Enhancer
+# LLM Council
 
-Transform basic prompts into professional-grade prompts using the best AI models.
+A powerful multi-model AI system that consults the best LLMs (o3, Claude Opus 4, Gemini 2.5 Pro) in parallel and synthesizes their responses for superior results.
 
-## Features
+## Why Use a Council?
 
-- **Single Model**: Use o3 (OpenAI) for fast enhancement
-- **LLM Council**: Use 3 models in parallel (o3 + Claude Opus 4 + Gemini 2.5 Pro) with intelligent aggregation
-- **10 Enhancement Strategies**: Master, role injection, chain-of-thought, and more
-- **Prompt Analysis**: Analyze prompts for ambiguities and improvements
+Single LLMs have blind spots. A council of diverse models provides:
+- **Multiple perspectives** on complex problems
+- **Cross-validation** of recommendations
+- **Synthesis** of the best ideas from each model
+- **Higher confidence** for important decisions
 
-## Models Used
+## Models
 
-| Provider | Model | Role |
-|----------|-------|------|
-| OpenAI | **o3** | Best reasoning model |
-| Anthropic | **Claude Opus 4** | Best Claude + Aggregator |
-| Google | **Gemini 2.5 Pro** | Best Gemini model |
+| Provider | Model | Strength |
+|----------|-------|----------|
+| OpenAI | **o3** | Deep reasoning, complex logic |
+| Anthropic | **Claude Opus 4** | Synthesis, nuance, aggregation |
+| Google | **Gemini 2.5 Pro** | Broad knowledge, creative solutions |
+
+## Components
+
+| Component | Description |
+|-----------|-------------|
+| `project_council.py` | **Deep project-aware agent** - Analyzes codebase, asks clarifying questions, reads relevant code |
+| `council_agent.py` | **Standalone CLI** - Quick access for code review, debug, security, architecture |
+| `mcp_council_server.py` | **MCP Server** - Native Claude Code integration |
+| `council.py` | **Core library** - Prompt enhancement with council |
+
+---
 
 ## Installation
 
 ```bash
-pip install -e .
+git clone https://github.com/retolutz/llm-council.git
+cd llm-council
+pip install -r requirements.txt
 ```
 
-## Setup
+## Configuration
 
 ```bash
 cp .env.example .env
 ```
 
-Add your API keys to `.env`:
+Add your API keys:
 ```
-OPENAI_API_KEY=sk-...
+OPENAI_API_KEY=sk-proj-...
 ANTHROPIC_API_KEY=sk-ant-...
 GOOGLE_API_KEY=AIza...
 ```
 
+---
+
 ## Usage
 
-### LLM Council (Recommended for important prompts)
+### 1. Project Council (Recommended for Complex Tasks)
 
-Uses all 3 models in parallel, then aggregates the best result:
-
-```bash
-prompt-enhancer council "Write a business plan for an AI startup"
-
-# Show all individual responses
-prompt-enhancer council -a "Create a marketing strategy"
-```
-
-### Single Model Enhancement
-
-Fast enhancement using o3:
+The most powerful mode. Deeply understands your project before providing recommendations.
 
 ```bash
-prompt-enhancer enhance "Write a blog post about AI"
-
-# With comparison analysis
-prompt-enhancer enhance -c "Create a marketing strategy"
-
-# Interactive mode
-prompt-enhancer enhance -i
-
-# Specific strategy
-prompt-enhancer enhance -s role "Help me code"
-prompt-enhancer enhance -s cot "Solve this problem"
-```
-
-### Iterative Enhancement
-
-Apply multiple strategies sequentially:
-
-```bash
-prompt-enhancer iterative "Build an app"
-```
-
-### Analyze a Prompt
-
-```bash
-prompt-enhancer analyze "Make my website faster"
-```
-
-## LLM Council Architecture
-
-```
-┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-│   o3 (OpenAI)   │  │ Claude Opus 4   │  │ Gemini 2.5 Pro  │
-│    Reasoning    │  │    Synthesis    │  │    Creative     │
-└────────┬────────┘  └────────┬────────┘  └────────┬────────┘
-         │                    │                    │
-         └───────────── parallel ─────────────────┘
-                              │
-                              ▼
-                   ┌──────────────────────┐
-                   │   Claude Opus 4      │
-                   │   (Aggregator)       │
-                   │   Selects/merges     │
-                   │   best elements      │
-                   └──────────┬───────────┘
-                              │
-                              ▼
-                   ┌──────────────────────┐
-                   │   Final Prompt       │
-                   └──────────────────────┘
-```
-
-## Available Strategies
-
-| Strategy | Description |
-|----------|-------------|
-| `master` | **Comprehensive enhancement (recommended)** |
-| `semantic` | Analyze semantic components |
-| `role` | Add expert persona |
-| `constraint` | Add MUST/MUST NOT rules |
-| `cot` | Chain-of-thought reasoning |
-| `context` | Full context saturation |
-| `decompose` | Break into sub-tasks |
-| `output` | Specify output format |
-| `fewshot` | Add examples |
-| `refine` | Self-critique loop |
-
-## Example
-
-**Input:**
-```
-Schreibe einen LinkedIn Post über KI
-```
-
-**Output (Council):**
-```
-Du bist ein erfahrener deutschsprachiger LinkedIn Content Creator
-mit nachweislicher Expertise in Tech-Themen und viralen B2B-Posts.
-
-**STRUKTURVORGABEN:**
-1. Hook (erste 2 Zeilen): Starke, überraschende Aussage
-2. Story/Insight (2-3 Absätze): Persönliche Anekdote oder Datenpunkt
-3. Praktischer Nutzen: 3-5 konkrete Takeaways
-4. Call-to-Action: Engagementfördernde Frage
-
-**FORMATVORGABEN:**
-- Länge: 150-250 Wörter
-- Kurze Absätze (max. 2-3 Sätze)
-- 1 passendes Emoji pro Absatz
-- 3-5 relevante Hashtags am Ende
-
-**VIRALITÄTSFAKTOREN:**
-- Polarisierend ohne unsachlich zu sein
-- Emotionaler Bezug
-- Diskussionsanregend und teilbar
-```
-
-## Python API
-
-```python
-# Single model
-from enhancer import PromptEnhancer
-
-enhancer = PromptEnhancer()
-result = enhancer.enhance("Your prompt", strategy="master")
-print(result.enhanced_prompt)
-
-# LLM Council
-from council import LLMCouncil
-
-council = LLMCouncil()
-result = council.enhance("Your prompt")
-print(result.enhanced_prompt)
-print(result.aggregator_reasoning)
-
-# Access individual responses
-for member in result.members:
-    print(f"{member.name}: {member.response[:100]}...")
-```
-
-## Council Agents
-
-### Project Council (Deep Context)
-
-The most powerful mode - analyzes your entire project and asks clarifying questions:
-
-```bash
-# Interactive mode - council asks questions to understand your task
+# Interactive mode - council asks questions to understand context
 python project_council.py
 
 # With specific task
-python project_council.py --task "Add authentication"
+python project_council.py --task "Add user authentication"
 
-# Quick mode (skip questions)
+# Quick mode (skip clarifying questions)
 python project_council.py ask "How should I structure the API?" --quick
 
-# Just analyze project
+# Just analyze project structure
 python project_council.py --analyze
+
+# Check available models
+python project_council.py status
 ```
 
-**How it works:**
-1. Analyzes project structure, dependencies, framework
-2. Each LLM generates 5 clarifying questions
-3. Reads relevant code files based on your answers
-4. Council deliberates with full context
-5. Synthesizes project-aware recommendations
+#### How Project Council Works
 
-### Council Agent (Standalone CLI)
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  PHASE 1: PROJECT ANALYSIS                                       │
+│  - Detect language/framework (Python, JS, Go, Rust, etc.)        │
+│  - Map project structure                                         │
+│  - Identify dependencies                                         │
+└──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  PHASE 2: CLARIFYING QUESTIONS (5 per LLM)                       │
+│                                                                  │
+│  o3: "What authentication method do you prefer?"                 │
+│  Claude: "Are there existing user models to integrate with?"     │
+│  Gemini: "Should this support SSO/OAuth providers?"              │
+│                                                                  │
+│  Questions are deduplicated and presented to user                │
+└──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  PHASE 3: CODE ANALYSIS                                          │
+│  - Identify relevant files based on answers                      │
+│  - Read and analyze key code sections                            │
+└──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────────┐
+│  PHASE 4: COUNCIL DELIBERATION                                   │
+│                                                                  │
+│  ┌─────────┐    ┌─────────┐    ┌─────────┐                      │
+│  │   o3    │    │ Claude  │    │ Gemini  │                      │
+│  │Reasoning│    │Synthesis│    │Creative │                      │
+│  └────┬────┘    └────┬────┘    └────┬────┘                      │
+│       └──────────────┼──────────────┘                            │
+│                      ▼                                           │
+│            ┌─────────────────┐                                   │
+│            │  Claude Opus 4  │                                   │
+│            │   Aggregator    │                                   │
+│            └────────┬────────┘                                   │
+│                     │                                            │
+│                     ▼                                            │
+│         PROJECT-AWARE RECOMMENDATION                             │
+└──────────────────────────────────────────────────────────────────┘
+```
 
-Direct council access for specific tasks:
+---
+
+### 2. Council Agent CLI
+
+Quick access to council expertise for specific tasks.
 
 ```bash
-# Code review
+# Code Review
 python council_agent.py review path/to/file.py
+python council_agent.py review src/auth.py --focus security
 
-# Architecture decision
-python council_agent.py architect "Should I use microservices?"
+# Architecture Decisions
+python council_agent.py architect "Should I use microservices or monolith?"
+python council_agent.py architect "Redis vs Memcached for caching?" --context "High-traffic web app"
 
-# Debug help
-python council_agent.py debug "App crashes on login" --code auth.py
+# Debugging Help
+python council_agent.py debug "App crashes when user logs in"
+python council_agent.py debug "Memory leak in production" --code src/server.py --error "OOM killed"
 
-# Security audit
-python council_agent.py security api.py
+# Security Audit
+python council_agent.py security api/endpoints.py
+python council_agent.py security src/ --context "Public-facing REST API"
 
-# General question
-python council_agent.py ask "Best caching strategy?"
+# Refactoring Suggestions
+python council_agent.py refactor legacy/old_code.py --goals "modernize, improve testability"
 
-# Check status
+# General Questions
+python council_agent.py ask "What's the best approach for real-time updates?"
+
+# Interactive Mode
+python council_agent.py interactive
+
+# Check Status
 python council_agent.py status
 ```
 
-### MCP Server (Claude Code Integration)
+---
 
-Integrate the council directly into Claude Code:
+### 3. Claude Code Integration (MCP Server)
 
-1. Create `.mcp.json` in your project:
+Integrate the council directly into Claude Code for seamless access.
+
+#### Global Installation (All Projects)
+
+```bash
+claude mcp add council python /path/to/llm-council/mcp_council_server.py \
+  --scope user \
+  -e "OPENAI_API_KEY=sk-..." \
+  -e "ANTHROPIC_API_KEY=sk-ant-..." \
+  -e "GOOGLE_API_KEY=AIza..."
+```
+
+#### Project-Specific Installation
+
+Create `.mcp.json` in your project:
+
 ```json
 {
   "mcpServers": {
     "council": {
       "command": "python",
-      "args": ["/path/to/mcp_council_server.py"],
+      "args": ["/path/to/llm-council/mcp_council_server.py"],
       "env": {
         "OPENAI_API_KEY": "sk-...",
         "ANTHROPIC_API_KEY": "sk-ant-...",
@@ -245,17 +195,187 @@ Integrate the council directly into Claude Code:
 }
 ```
 
-2. Restart Claude Code - now you can say:
-   - "Ask the council to review this code"
-   - "Get the council's opinion on this architecture"
+#### Available Tools in Claude Code
 
-## Based On
+After setup, you can use these commands in any Claude Code session:
 
-Research from top prompt engineering projects:
-- [AI-Prompt-Enhancer](https://github.com/Pythonation/AI-Prompt-Enhancer) - DSE v7.0 cognitive architecture
-- [AutoPrompt](https://github.com/Eladlev/AutoPrompt) - Intent-based calibration
-- [MCP Prompt Optimizer](https://github.com/Bubobot-Team/mcp-prompt-optimizer) - Research-backed strategies
+| Command | Example |
+|---------|---------|
+| Code Review | "Ask the council to review this authentication code" |
+| Architecture | "Get the council's opinion on using GraphQL vs REST" |
+| Debug | "Have the council help debug this connection timeout" |
+| Security | "Run a council security audit on the API endpoints" |
+| Refactor | "Ask the council how to refactor this legacy module" |
+| General | "What does the council think about this approach?" |
+
+---
+
+### 4. Prompt Enhancement
+
+The original prompt enhancement functionality is also available.
+
+```bash
+# Single model (o3)
+prompt-enhancer enhance "Write a blog post about AI"
+
+# LLM Council enhancement
+prompt-enhancer council "Write a business plan for an AI startup"
+
+# Show all individual responses
+prompt-enhancer council -a "Create a marketing strategy"
+
+# Analyze a prompt
+prompt-enhancer analyze "Make my website faster"
+
+# List strategies
+prompt-enhancer strategies
+```
+
+---
+
+## Council Types
+
+| Type | Use Case | Best For |
+|------|----------|----------|
+| `review` | Code quality, bugs, best practices | PR reviews, code audits |
+| `architecture` | System design, tech decisions | New features, migrations |
+| `debug` | Root cause analysis, fix suggestions | Production issues, complex bugs |
+| `security` | Vulnerability assessment, OWASP | Security audits, compliance |
+| `refactor` | Code improvement, modernization | Technical debt, cleanup |
+| `test` | Test case generation, coverage | QA, edge cases |
+| `general` | Any complex question | Research, planning |
+
+---
+
+## When to Use the Council
+
+**Use the Council when:**
+- Making important architecture decisions
+- Reviewing security-critical code
+- Debugging complex issues with multiple possible causes
+- Wanting diverse perspectives on a problem
+- The cost of being wrong is high
+
+**Don't use the Council when:**
+- Simple, straightforward tasks
+- Time-sensitive quick fixes
+- Budget is a major concern (3x API costs)
+
+---
+
+## Cost Considerations
+
+Each council consultation calls 3 models + 1 aggregation.
+
+| Model | Estimated Cost |
+|-------|----------------|
+| o3 | ~$0.10-0.50 |
+| Claude Opus 4 | ~$0.05-0.20 |
+| Gemini 2.5 Pro | ~$0.01-0.05 |
+| Aggregation | ~$0.05-0.15 |
+| **Total** | **~$0.20-0.90 per consultation** |
+
+Use wisely for high-value decisions.
+
+---
+
+## Python API
+
+```python
+# Project Council
+from project_council import ProjectCouncil
+
+council = ProjectCouncil("/path/to/project")
+council.analyze_project()
+
+# Get clarifying questions
+questions = council.generate_clarifying_questions("Add authentication")
+
+# Consult with full context
+result = council.consult_council(
+    task="Add JWT authentication",
+    answers={"preferred_method": "JWT with refresh tokens"},
+    relevant_code={"auth.py": "...code..."},
+    council_type="implement"
+)
+print(result)
+
+# Council Agent
+from council_agent import CouncilAgent
+
+agent = CouncilAgent()
+result = agent.consult(
+    task="Review this code for security issues",
+    context=open("api.py").read(),
+    council_type="security",
+    show_individual=True
+)
+print(result["synthesis"])
+
+# Prompt Enhancement
+from council import LLMCouncil
+
+council = LLMCouncil()
+result = council.enhance("Write a marketing email")
+print(result.enhanced_prompt)
+print(result.aggregator_reasoning)
+```
+
+---
+
+## Architecture
+
+```
+llm-council/
+├── project_council.py     # Deep project-aware agent
+├── council_agent.py       # Standalone CLI tool
+├── mcp_council_server.py  # MCP server for Claude Code
+├── council.py             # Core council for prompt enhancement
+├── enhancer.py            # Single-model prompt enhancer
+├── strategies.py          # Enhancement strategies
+├── cli.py                 # CLI entry point
+├── requirements.txt       # Dependencies
+├── setup.py               # Package setup
+├── .env.example           # Environment template
+└── CLAUDE_CODE_SETUP.md   # Claude Code setup guide
+```
+
+---
+
+## Requirements
+
+- Python 3.9+
+- API keys for at least one provider (all three recommended)
+
+### Dependencies
+
+```
+openai>=1.40.0
+anthropic>=0.40.0
+google-genai>=1.0.0
+rich>=13.7.0
+click>=8.1.7
+python-dotenv>=1.0.0
+mcp>=1.0.0
+```
+
+---
 
 ## License
 
 MIT
+
+---
+
+## Contributing
+
+Contributions welcome! Please open an issue or PR.
+
+---
+
+## Credits
+
+Built with the best LLMs:
+- [OpenAI o3](https://openai.com)
+- [Anthropic Claude Opus 4](https://anthropic.com)
+- [Google Gemini 2.5 Pro](https://deepmind.google/technologies/gemini/)

@@ -11,7 +11,7 @@ The MCP server integrates directly with Claude Code as a native tool.
 #### 1. Install dependencies
 
 ```bash
-cd /Users/retolutz/Desktop/prompt_enhancer
+cd /Users/retolutz/Desktop/llm-council
 pip install -r requirements.txt
 ```
 
@@ -24,7 +24,7 @@ Add to `~/.claude/settings.json`:
   "mcpServers": {
     "council": {
       "command": "python",
-      "args": ["/Users/retolutz/Desktop/prompt_enhancer/mcp_council_server.py"],
+      "args": ["/Users/retolutz/Desktop/llm-council/mcp_council_server.py"],
       "env": {
         "OPENAI_API_KEY": "sk-proj-...",
         "ANTHROPIC_API_KEY": "sk-ant-...",
