@@ -70,63 +70,63 @@ def init_clients():
 
 
 def call_openai(prompt: str, system: str) -> dict:
-    """Call OpenAI o3."""
+    """Call OpenAI GPT-5.4."""
     if not openai_client:
-        return {"model": "o3", "response": None, "error": "Not configured"}
+        return {"model": "GPT-5.4", "response": None, "error": "Not configured"}
     try:
         response = openai_client.chat.completions.create(
-            model="o3",
+            model="gpt-5.4",
             messages=[
                 {"role": "system", "content": system},
                 {"role": "user", "content": prompt}
             ],
         )
         return {
-            "model": "o3 (OpenAI)",
+            "model": "GPT-5.4 (OpenAI)",
             "response": response.choices[0].message.content,
             "error": None
         }
     except Exception as e:
-        return {"model": "o3 (OpenAI)", "response": None, "error": str(e)}
+        return {"model": "GPT-5.4 (OpenAI)", "response": None, "error": str(e)}
 
 
 def call_anthropic(prompt: str, system: str) -> dict:
-    """Call Claude Opus 4."""
+    """Call Claude Opus 4.7."""
     if not anthropic_client:
-        return {"model": "Claude Opus 4", "response": None, "error": "Not configured"}
+        return {"model": "Claude Opus 4.7", "response": None, "error": "Not configured"}
     try:
         response = anthropic_client.messages.create(
-            model="claude-opus-4-20250514",
+            model="claude-opus-4-7",
             max_tokens=8192,
             system=system,
             messages=[{"role": "user", "content": prompt}],
         )
         return {
-            "model": "Claude Opus 4 (Anthropic)",
+            "model": "Claude Opus 4.7 (Anthropic)",
             "response": response.content[0].text,
             "error": None
         }
     except Exception as e:
-        return {"model": "Claude Opus 4 (Anthropic)", "response": None, "error": str(e)}
+        return {"model": "Claude Opus 4.7 (Anthropic)", "response": None, "error": str(e)}
 
 
 def call_google(prompt: str, system: str) -> dict:
-    """Call Gemini 2.5 Pro."""
+    """Call Gemini 3 Pro."""
     if not google_client:
-        return {"model": "Gemini 2.5 Pro", "response": None, "error": "Not configured"}
+        return {"model": "Gemini 3 Pro", "response": None, "error": "Not configured"}
     try:
         full_prompt = f"{system}\n\n{prompt}"
         response = google_client.models.generate_content(
-            model="gemini-2.5-pro",
+            model="gemini-3-pro-preview",
             contents=full_prompt,
         )
         return {
-            "model": "Gemini 2.5 Pro (Google)",
+            "model": "Gemini 3 Pro (Google)",
             "response": response.text,
             "error": None
         }
     except Exception as e:
-        return {"model": "Gemini 2.5 Pro (Google)", "response": None, "error": str(e)}
+        return {"model": "Gemini 3 Pro (Google)", "response": None, "error": str(e)}
 
 
 def aggregate_responses(task: str, responses: list) -> str:
@@ -161,7 +161,7 @@ Provide a clear, actionable synthesis."""
     if anthropic_client:
         try:
             response = anthropic_client.messages.create(
-                model="claude-opus-4-20250514",
+                model="claude-opus-4-7",
                 max_tokens=8192,
                 messages=[{"role": "user", "content": aggregation_prompt}],
             )
