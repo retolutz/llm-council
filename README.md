@@ -122,6 +122,12 @@ Make the council available as tools inside Claude Code. Once set up, any Claude 
 | `council_security` | OWASP-style audits, auth patterns |
 | `council_refactor` | Modernization, reducing technical debt |
 
+**Deliberation tool** (two rounds, peer review):
+
+| Tool | Use case |
+|------|----------|
+| `council_deliberate` | High-stakes decisions where you want to see peer critique, not just three independent answers. Round 1: parallel answers. Round 2: each model ranks the other two anonymized (A/B), flags the strongest point and the shared blindspot. Output includes an aggregated ranking. Costs ~2x a standard call. |
+
 **Research tools** (slower, web search enabled on all three models):
 
 | Tool | Use case |
@@ -166,16 +172,17 @@ Restart Claude Code. Then in any session:
 
 ---
 
-## Standard mode vs Research mode
+## Three modes
 
-| | Standard | Research |
-|---|---|---|
-| Web search | Off | On (all three models) |
-| Latency | ~5-20s | ~30-90s |
-| Cost per call | ~$0.20-0.90 | ~$0.60-2.50 |
-| Best for | Architecture, code review, debugging | Current versions, pricing, advisories, recent news |
+| | Standard | Deliberation | Research |
+|---|---|---|---|
+| Web search | Off | Off | On (all three models) |
+| Rounds | 1 (parallel) | 2 (parallel + peer review) | 1 (parallel) |
+| Latency | ~5-20s | ~30-60s | ~30-90s |
+| Cost per call | ~$0.15-0.70 | ~$0.40-1.50 | ~$0.50-2.00 |
+| Best for | Architecture, code review, debugging | High-stakes decisions where peer critique matters | Current versions, pricing, advisories, recent news |
 
-Standard mode uses the models' training knowledge — reliable for timeless concepts, unreliable for anything that changed recently. Research mode costs more and takes longer, but every answer is grounded in sources the model fetched at call time.
+Standard uses training knowledge — reliable for timeless concepts, unreliable for anything that changed recently. Deliberation adds a peer-review round where each model rates the other two anonymized — surfaces blindspots and gives you a ranking. Research grounds every answer in live sources.
 
 ---
 
@@ -199,12 +206,13 @@ Standard mode uses the models' training knowledge — reliable for timeless conc
 
 Three model calls in parallel. No server-side aggregation — the calling session synthesizes.
 
-| Step | Standard | Research |
-|------|----------|----------|
-| GPT-5.4 | $0.05 - $0.30 | $0.15 - $0.80 |
-| Claude Opus 4.7 | $0.05 - $0.25 | $0.20 - $0.80 |
-| Gemini 3 Pro | $0.05 - $0.15 | $0.15 - $0.40 |
-| **Total** | **$0.15 - $0.70** | **$0.50 - $2.00** |
+| Step | Standard | Deliberation | Research |
+|------|----------|--------------|----------|
+| GPT-5.4 | $0.05 - $0.30 | $0.10 - $0.60 | $0.15 - $0.80 |
+| Claude Opus 4.7 | $0.05 - $0.25 | $0.10 - $0.50 | $0.20 - $0.80 |
+| Gemini 3 Pro | $0.05 - $0.15 | $0.10 - $0.30 | $0.15 - $0.40 |
+| Peer-review round | — | $0.10 - $0.60 | — |
+| **Total** | **$0.15 - $0.70** | **$0.40 - $1.50** | **$0.50 - $2.00** |
 
 Rule of thumb: if being wrong costs you less than 15 minutes of work, skip the council.
 
